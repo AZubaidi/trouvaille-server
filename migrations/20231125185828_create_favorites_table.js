@@ -2,11 +2,9 @@
  * @param { import("knex").Knex } knex
  * @returns { Promise<void> }
  */
-exports.up = function(knex) {
-  return knex.schema.createTable('destinations'), (table) => {
-    table.integer('user_id, point_id').primary();
-    table
-      .integer('user_id')
+exports.up = async function(knex) {
+  return knex.schema.createTable('favorites', (table) => {
+    table.integer('user_id').primary()
       .unsigned()
       .references('users.id')
       .onUpdate('CASCADE')
@@ -17,7 +15,7 @@ exports.up = function(knex) {
       .references('points.id')
       .onUpdate('CASCADE')
       .onDelete('CASCADE');
-  }
+  });
 };
 
 /**
@@ -25,5 +23,5 @@ exports.up = function(knex) {
  * @returns { Promise<void> }
  */
 exports.down = function(knex) {
-  return knex.schema.dropTableIfExists('points');
+  return knex.schema.dropTableIfExists('favorites');
 };

@@ -3,12 +3,10 @@
  * @returns { Promise<void> }
  */
 exports.up = async function(knex) {
-  return knex.schema.createTable('destinations', (table) => {
+  return knex.schema.createTableIfNotExists('users', (table) => {
     table.increments('id').primary();
-    table.string('name').notNullable();
-    table.string('country');
-    table.string('photo').notNullable();
-    table.string('category').notNullable();
+    table.string('username').notNullable();
+    table.string('password').notNullable();
   });
 };
 
@@ -17,5 +15,5 @@ exports.up = async function(knex) {
  * @returns { Promise<void> }
  */
 exports.down = function(knex) {
-  return knex.schema.dropTableIfExists('destinations');
+  return knex.schema.dropTableIfExists('users');
 };

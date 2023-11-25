@@ -26,8 +26,8 @@ router.get('/:id', async (req, res) => {
 
 router.get('/:id/points', async (req, res) => {
     const id = req.params.id;
-    const destinations = await knex('warehouses').where({id: id}).first();
-    if (!destinations) return res.status(404).json({error: 'Warehouse not found.'});
+    const destinations = await knex('destinations').where({id: id}).first();
+    if (!destinations) return res.status(404).json({error: 'Destination not found.'});
 
     const points = await knex('points')
         .where({destination_id : id})

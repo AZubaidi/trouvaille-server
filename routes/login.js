@@ -1,3 +1,9 @@
+const express = require("express");
+const router = express.Router();
+const knex = require('knex')(require('../knexfile'));
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+
 // ## POST /api/users/login
 // -   Generates and responds a JWT for the user to use for future authorization.
 // -   Expected body: { email, password }
@@ -16,7 +22,7 @@ router.post("/", async (req, res) => {
   }
 
   // Validate the password
- const isPasswordCorrect = bcrypt.compareSync(password, user.password);
+  const isPasswordCorrect = bcrypt.compareSync(password, user.password);
   if (!isPasswordCorrect) {
     return res.status(400).send("Invalid password");
   } 
@@ -27,5 +33,10 @@ router.post("/", async (req, res) => {
     process.env.JWT_KEY,
     { expiresIn: "24h" }
   );
-  res.json({ token });
+  res.json({ 
+        token: token,
+        username: user.username,
+    });
 });
+
+module.exports = router;

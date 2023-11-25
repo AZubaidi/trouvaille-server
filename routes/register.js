@@ -1,6 +1,7 @@
 const router = require("express").Router();
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const knex = require('knex')(require('../knexfile'));
 
 const users = [];
 
@@ -23,7 +24,7 @@ router.post("/", async (req, res) => {
 
   // Create the new user
   const newUser = {
-    username
+    username: username,
     /* password, */
     password: hashedPassword,
   };
@@ -37,3 +38,5 @@ router.post("/", async (req, res) => {
     res.status(400).send("Failed registration");
   }
 });
+
+module.exports = router;
