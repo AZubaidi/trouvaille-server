@@ -17,7 +17,7 @@ app.use('/api/warehouses', warehousesRoute);
 const inventoriesRoute = require('./routes/inventories.js');
 app.use('/api/inventories', inventoriesRoute);
 
-app.get('/api', (req, res) => {
+app.get('/api', (_req, res) => {
   res.send(`API is running`);
 });
 
