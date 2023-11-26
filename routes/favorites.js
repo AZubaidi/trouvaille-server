@@ -1,33 +1,67 @@
 const express = require("express");
 const router = express.Router();
 const knex = require('knex')(require('../knexfile'));
+const jwt = require("jsonwebtoken");
 
-router.get('/:username', async (req, res) => {
-    const username = req.params.username;
+router.get('/', async (req, res) => {
+    if (!req.headers.authorization) {
+        return res.status(401).send("Please include your bearer token");
+      }
+    const authHeader = req.headers.authorization;
+    const authToken = authHeader.split(" ")[1];
     try {
-        const user = await knex('users').select('*').where({username: username}).first();
+        const decoded = jwt.verify(authToken, process.env.JWT_KEY);
+        const userId = decoded.id
+        const user = await knex('users').select('*').where({id: userId}).first();
         if (!user) return res.status(400).json({error: 'User not found'});
 
         const favorites = await knex('favorites').select('*').where({user_id: user.id});
         return res.status(200).json(favorites);
     } catch (error) {
         console.error(error);
-        return res.status(500).json({ error: 'Internal Server Error' });
+        return res.status(500).json({ error: 'This point is already favorited.' });
     }
 });
 
-router.post('/:username', async (req, res) => {
-    const username = req.params.username;
+router.post('/', async (req, res) => {
+    if (!req.headers.authorization) {
+        return res.status(401).send("Please include your bearer token");
+      }
+    const authHeader = req.headers.authorization;
+    const authToken = authHeader.split(" ")[1];
     const point_id = req.body.point_id;
     if (!point_id) return res.status(400).json({error: 'Please provide a point_id in the body.'});
     try {
-        const user = await knex('users').select('*').where({username: username}).first();
+        const decoded = jwt.verify(authToken, process.env.JWT_KEY);
+        const userId = decoded.id;
+        const user = await knex('users').select('*').where({id: userId}).first();
         if (!user) return res.status(400).json({error: 'User not found'});
-        const newFavourite = await knex('favorites').insert({
+        await knex('favorites').insert({
             user_id: user.id,
             point_id: point_id,
         });
-        return res.status(201).json({newFavourite});
+        return res.status(201).json({user_id: user.id, point_id: point_id});
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ error: 'This point is already favorited.' });
+    }
+});
+
+router.delete('/', async (req, res) => {
+    if (!req.headers.authorization) {
+        return res.status(401).send("Please include your bearer token");
+      }
+    const authHeader = req.headers.authorization;
+    const authToken = authHeader.split(" ")[1];
+    const point_id = req.body.point_id;
+    if (!point_id) return res.status(400).json({error: 'Please provide a point_id in the body.'});
+    try {
+        const decoded = jwt.verify(authToken, process.env.JWT_KEY);
+        const userId = decoded.id;
+        const user = await knex('users').select('*').where({id: userId}).first();
+        if (!user) return res.status(400).json({error: 'User not found'});
+        await knex('favorites').where({user_id: user.id, point_id: point_id}).del();
+        return res.status(201).json('successfully deleted');
     } catch (error) {
         console.error(error);
         return res.status(500).json({ error: 'Internal Server Error' });

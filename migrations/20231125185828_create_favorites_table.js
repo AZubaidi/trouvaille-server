@@ -4,7 +4,7 @@
  */
 exports.up = async function(knex) {
   return knex.schema.createTable('favorites', (table) => {
-    table.integer('user_id').primary()
+    table.integer('user_id')
       .unsigned()
       .references('users.id')
       .onUpdate('CASCADE')
@@ -15,6 +15,8 @@ exports.up = async function(knex) {
       .references('points.id')
       .onUpdate('CASCADE')
       .onDelete('CASCADE');
+
+    table.primary(['user_id', 'point_id']);
   });
 };
 
