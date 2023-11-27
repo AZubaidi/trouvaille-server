@@ -39,7 +39,9 @@ router.post('/', async (req, res) => {
         await knex('favorites').insert({
             user_id: user.id,
             point_id: point_id,
-        });
+        })
+        .onConflict(['user_id', 'point_id'])
+        .ignore(); //.ignore will ignore the insert if exists
         return res.status(201).json({user_id: user.id, point_id: point_id});
     } catch (error) {
         console.error(error);
@@ -47,14 +49,13 @@ router.post('/', async (req, res) => {
     }
 });
 
-router.delete('/', async (req, res) => {
+router.delete('/:id', async (req, res) => {
+    const point_id = req.params.id;
     if (!req.headers.authorization) {
         return res.status(401).send("Please include your bearer token");
       }
     const authHeader = req.headers.authorization;
     const authToken = authHeader.split(" ")[1];
-    const point_id = req.body.point_id;
-    if (!point_id) return res.status(400).json({error: 'Please provide a point_id in the body.'});
     try {
         const decoded = jwt.verify(authToken, process.env.JWT_KEY);
         const userId = decoded.id;

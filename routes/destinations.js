@@ -5,6 +5,7 @@ const knex = require('knex')(require('../knexfile'));
 router.get('/', async (_req, res) => {
     try {
         const destinations = await knex('destinations').select('*');
+        console.log(destinations);
         return res.status(200).json(destinations);
     } catch (error) {
         console.error(error);
